@@ -56,12 +56,10 @@ int main() {
 			success = true;
 			continue;
 		}
-		// cout << favOneSum << endl;
 		for (long i = 0; i < o2; i++) {
 			for(long j = 0; j < o1; j++) {
 				long a = (j * o2) + i;
 				long b = a + o2 >= n ? a + o2 - n : a + o2;
-				// cout << a << " " << b << endl;
 				if (sums[j] > bestOfO2) {
 					favOneSum--;
 				}
