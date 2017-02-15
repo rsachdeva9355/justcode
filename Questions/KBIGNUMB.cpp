@@ -25,7 +25,35 @@ using namespace std;
 
 #define ll long long
 
-ll modulo(ll a, ll b, ll m){
+map< long, vector<long> > primeFactors;
+
+void prefill() {
+	primeFactors.insert(make_pair(2, vector<long>{11}));
+	primeFactors.insert(make_pair(3, vector<long>{3, 37}));
+	primeFactors.insert(make_pair(4, vector<long>{11, 101}));
+	primeFactors.insert(make_pair(5, vector<long>{41, 271}));
+	primeFactors.insert(make_pair(6, vector<long>{3,7,11,13,37}));
+	primeFactors.insert(make_pair(7, vector<long>{239,4649}));
+	primeFactors.insert(make_pair(8, vector<long>{11,73,101,137}));
+	primeFactors.insert(make_pair(9, vector<long>{3,3,37,333667}));
+	primeFactors.insert(make_pair(10, vector<long>{11,41,271,9091}));
+}
+
+long moduloPower(long x, long y, long p)
+{
+    int res = 1;
+    x = x % p;
+    while (y > 0)
+    {
+        if (y & 1)
+            res = (res*x) % p;
+        y = y>>1; // y = y/2
+        x = (x*x) % p;  
+    }
+    return res;
+}
+
+ll moduloMultiply(ll a, ll b, ll m){
     ll result = 0;
     a %= m;
     b %= m;
@@ -41,44 +69,8 @@ ll modulo(ll a, ll b, ll m){
     return result;
 }
 
-long findModuloPower10(long power, long mod, map<long, long> &powerMap) {
-	if (powerMap.find(power) != powerMap.end()) {
-		return powerMap[power];
-	}
-	if (power < 6) {
-		long answer = pow((long)10,(long)power) % (long	)mod;
-		powerMap.insert(make_pair(power, answer));
-		return answer;
-	}
-	long result = modulo(findModuloPower10(power/2, mod, powerMap), findModuloPower10(power - power/2, mod, powerMap), mod);
-	powerMap.insert(make_pair(power, result));
-	//cout << "result " << result << endl;
-	return result;
-}
-
-ll solve(long a, ll n, long m, long nod) {
-	map<long, long> powerMap;
-	map<long, long> repititionMap, reverseMap;
-	ll result = 0;
-	ll am = a % m;
-	ll prevModulo = am;
-	repititionMap.insert(make_pair(prevModulo, 0));
-	reverseMap.insert(make_pair(0, prevModulo));
-	for (ll i = 1; i < n; i++) {
-		prevModulo = ((prevModulo % m) + modulo(am, findModuloPower10(i * nod, m, powerMap), m)) % m;
-		if (repititionMap.find(prevModulo) == repititionMap.end()) {
-			repititionMap.insert(make_pair(prevModulo, i));
-			reverseMap.insert(make_pair(i, prevModulo));
-		} else {
-			ll repitionStartIndex = repititionMap.find(prevModulo) -> second;
-			ll totalReps = i - repitionStartIndex;
-			if (totalReps == 1) {
-				return prevModulo;
-			}
-			return (reverseMap.find(n % (totalReps + 1)) -> second);
-		}
-	}
-	return prevModulo;
+long modOfReverse(long n, long mod) {
+	return (moduloPower(n, mod - 2, mod) % mod);
 }
 
 long findNumberOfDigits(long a) {
@@ -90,15 +82,37 @@ long findNumberOfDigits(long a) {
 	return count;
 }
 
+long findModOfOnes(ll nod, long mod) {
+	if (nod == 1) {
+		return 1;
+	}
+	vector<long> factors = primeFactors.find(nod) -> second;
+	long result = 1;
+	for (long i = 0; i < factors.size(); i++) {
+		result = moduloMultiply(result, modOfReverse(factors[i], mod), mod) % mod;
+	}
+	return result;
+}
+
+void solve(long a, ll n, long m, long nod) {
+	map<long, long> powerMap;
+	long numerator = moduloMultiply(a%m, ((moduloPower(10, n * nod +  1, m)) - 1) % m, m);
+	long three = moduloPower(3, m - 2, m);
+	long denominator = findModOfOnes(nod, m);
+	cout << numerator << " " << three << " " << denominator << endl;
+	cout << moduloMultiply(numerator, moduloMultiply(three, moduloMultiply(three, denominator, m), m), m) % m << endl;
+}
+
 int main() {
+	prefill();
 	ll t;
 	cin >> t;
 	while (t--) {
 		ll n;
 		long a, m;
 		cin >> a >> n >> m;
-		long noOfDigits = findNumberOfDigits(a); 
-		cout << solve(a, n, m, noOfDigits) << endl;
+		long noOfDigits = findNumberOfDigits(a);
+		solve(a, n, m, noOfDigits);
 	}
 	return 0;
 }
