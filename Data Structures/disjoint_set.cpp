@@ -3,30 +3,34 @@
 
 using namespace std;
 
-int find(int *arr, int n) {
+int find(long *arr, long n) {
 	if (arr[n] != n) {
 		return find(arr, arr[n]);
 	}
 	return n;
 }
 
-void doUnion(int *arr, int *rank, int x, int y) {
-	if (arr[x] != arr[y]) {
-		if (rank[arr[x]] >= rank[arr[y]]) {
-			rank[arr[x]] += rank[arr[y]];
-			arr[y] = arr[x];
-		} else {
-			rank[arr[y]] += rank[arr[x]];
-			arr[x] = arr[y];
-		}
+void doUnion(long *arr, long *rank, long *nodes, long x, long y) {
+	long px = find(arr, x);
+	long py = find(arr, y);
+	if (rank[px] > rank[py]) {
+		nodes[px] += nodes[py];
+		arr[py] = px;
+	} else {
+		nodes[py] += nodes[px];
+		arr[px] = py;
+	}
+	if (rank[px] == rank[py]) {
+		rank[py] += 1;
 	}
 }
 
 int main() {
 	int n, m;
 	cin >> n >> m;
-	int arr[n + 1];
-	int rank[n + 1];
+	long arr[n + 1];
+	long rank[n + 1];
+	long nodes[n + 1];
 	memset(rank, 1, n);
 
 	for (int i = 1; i <= n; i++) {
@@ -36,11 +40,7 @@ int main() {
 	for (int i = 0; i < m; i++) {
 		int x,y;
 		cin >> x >> y;
-		doUnion(arr, rank, x,y);
-	}
-
-	for (int i = 1; i <= n; i++) {
-		cout << find(arr, i) << endl;
+		doUnion(arr, rank, nodes, x,y);
 	}
 
 	return 0;
