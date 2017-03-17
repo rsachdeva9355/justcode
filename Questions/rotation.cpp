@@ -1,50 +1,32 @@
-#include <map>
-#include <set>
-#include <list>
 #include <cmath>
-#include <ctime>
-#include <deque>
-#include <queue>
-#include <stack>
-#include <string>
-#include <bitset>
 #include <cstdio>
-#include <limits>
 #include <vector>
-#include <climits>
-#include <cstring>
-#include <cstdlib>
-#include <fstream>
-#include <numeric>
-#include <sstream>
 #include <iostream>
 #include <algorithm>
-#include <unordered_map>
-
 using namespace std;
 
-int findIndex(long i, long k, long n) {
-    long res = i + k;
-    if (res > n - 1) {
-        res = res - n;
+long getIndex(long n, long k, long a) {
+    long ind = a - k;
+    if (ind < 0) {
+        ind = n + ind;
     }
-    return res;
+    return ind;
 }
 
-int main(){
-    long n;
-    long k;
-    long q;
+int main() {
+    long n, k, q;
     cin >> n >> k >> q;
-    vector<int> a(n);
-    cout << 'a' - 96;
-    for(long a_i = 0;a_i < n;a_i++){
-       cin >> a[findIndex(a_i, k, n)];
+    if (k >= n) {
+        k = k % n;
     }
-    for(long a0 = 0; a0 < q; a0++){
-        long m;
-        cin >> m;
-        cout << a[m] << endl;
+    vector<long> arr(n);
+    for (long i = 0; i < n; i++) {
+        cin >> arr[i];
+    }
+    for (long i = 0; i < q; i++) {
+        long a;
+        cin >> a;
+        cout << getIndex(n, k, a)<<endl;
     }
     return 0;
 }
